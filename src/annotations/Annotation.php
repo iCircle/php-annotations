@@ -42,7 +42,7 @@ class Annotation{
             $type = "NATIVE";
         }
 
-        if($type == "NATIVE"){
+        if($type == "NATIVE" || $type == ""){
             self::$_annotations = array_merge(self::$_annotations,$source);
         }else{
             throw new \Exception("Error in registering annotations , Invalid type of source : $type");
@@ -77,6 +77,10 @@ class Annotation{
         }
     }
 
+    public static function getAnnotationRegistry(){
+        return array_merge(array(),self::$_annotations);
+    }
+
     /**
      * This method returns the annotations for the specified class or specified member of the class
      * @param string $className : Name of the class
@@ -104,7 +108,7 @@ class Annotation{
 
         $reflectionClass = new \ReflectionClass($className);
 
-        if(is_string($memberName) && $memberName != "*"){
+        if(is_string($memberName) && $memberName != "*" && $memberName != ""){
             $reflectionProperty = null;
             $reflectionPropertyType = null;
             try{
@@ -208,22 +212,29 @@ class Annotation{
             // if annotationName is not a string , OR
             // if count of tokens is less , then this line does not contain annotations
             if($tokens[$annotationNameTokenIndex-1] != "@" ||
-                !(is_array($tokens[$annotationNameTokenIndex] && $tokens[$annotationNameTokenIndex][0] == T_STRING))){
+                !(is_array($tokens[$annotationNameTokenIndex]) && $tokens[$annotationNameTokenIndex][0] == T_STRING)){
                 continue;
             }
 
             $annotationName = $tokens[$annotationNameTokenIndex][1];
 
-            $annotationDefinition = self::$_annotations[$annotationName];
-
-            if(!isset($annotationDefinition)){
+            if(!array_key_exists($annotationName,self::$_annotations)){
                 continue;
             }
+            $annotationDefinition = self::$_annotations[$annotationName];
 
             // check for appliedOn
             $_appliedOn = $annotationDefinition[self::APPLIED_ON];
             if(isset($_appliedOn)){
-                if(trim(strtoupper($_appliedOn)) != "ALL" && trim(strtoupper($_appliedOn)) != trim(strtoupper($type))){
+                if(is_string($_appliedOn)){
+                    if(trim(strtoupper($_appliedOn)) != "ALL" && trim(strtoupper($_appliedOn)) != trim(strtoupper($type))){
+                        continue;
+                    }
+                }else if(is_array($_appliedOn)){
+                    if(!in_array($type,$_appliedOn)){
+                        continue;
+                    }
+                }else{
                     continue;
                 }
             }
@@ -292,9 +303,8 @@ class Annotation{
                 continue;
             }
 
-            $_annotationValidationFunction = $annotationDefinition[self::VALIDATE];
-            if(isset($_annotationValidationFunction) && is_callable($_annotationValidationFunction)){
-                $annotationValue = $_annotationValidationFunction($annotationValue);
+            if(array_key_exists(self::VALIDATE,$annotationDefinition) && is_callable($annotationDefinition[self::VALIDATE])){
+                $annotationValue = $annotationDefinition[self::VALIDATE]($annotationValue);
             }else if($annotationValue == null){
                 // check for null
                 $_allowNull = $annotationDefinition[self::ALLOW_NULL];
