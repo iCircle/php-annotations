@@ -4,7 +4,6 @@
     "type": "library",
     "keywords": ["annotations","icircle"],
     "homepage": "http://icircle.co.in/developer/php-annotations",
-    "version":"1.0",
     "authors": [
         {
             "name": "Raghavendra K R",
