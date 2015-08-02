@@ -19,7 +19,7 @@ class SampleClass{
     private $property1 = null;
 
     /**
-     * @columnName PEROPERT1
+     * @columnName PEROPERT2
      * @required
      * @get true
      * @set false
@@ -28,11 +28,11 @@ class SampleClass{
     private $property2 = null;
 
     /**
-     * @columnName PEROPERT1
+     * @columnName PEROPERT3
      * @required
      * @get true
      * @set false
-     * @foreignField "icircle\annotations\Annotation->property1"
+     * @foreignField "icircle\\annotations\\Annotation->property1"
      */
     private $property3 = null;
 
@@ -125,9 +125,51 @@ class AnnotationTest extends \PHPUnit_Framework_TestCase{
 
     public function getAnnotationsDataProvider(){
         return array(
-            array(array("tableName"=>array("appliedOn"=>"class","allowNull"=>false,"type"=>"string"),
+            array(
+                array("tableName"=>array("appliedOn"=>"class","allowNull"=>false,"type"=>"string"),  // registry
                 "required"=>array("appliedOn"=>"property","type"=>"string")
-            ),'icircle\annotations\SampleClass',null,array("class"=>array("tableName"=>"SAMPLE")))
+                ),
+                'icircle\annotations\SampleClass', // className
+                null, // memberName
+                array("class"=>array("tableName"=>"SAMPLE"), // output
+                      "members"=>array(
+                          "property1"=>array("required"=>null),
+                          "property2"=>array("required"=>null),
+                          "property3"=>array("required"=>null)
+                      )
+                )
+            ),
+            array(
+                array("tableName"=>array("appliedOn"=>"class","allowNull"=>false,"type"=>"string"),  // registry
+                    "required"=>array("appliedOn"=>"property","type"=>"string"),
+                    "columnName"=>array("appliedOn"=>"property","allowNull"=>false,"type"=>"string"),
+                    "get"=>array("appliedOn"=>"property"),
+                    "set"=>array("appliedOn"=>"property"),
+                    "reference"=>array("appliedOn"=>"property"),
+                    "foreignField"=>array("appliedOn"=>"property","allowNull"=>false)
+                ),
+                'icircle\annotations\SampleClass', // className
+                null, // memberName
+                array("class"=>array("tableName"=>"SAMPLE"), // output
+                    "members"=>array(
+                        "property1"=>array( 'columnName' => 'PEROPERT1',
+                                            'required' => null,
+                                            'get' => 'true',
+                                            'set' => 'false',
+                                            'reference' => null),
+                        "property2"=>array( 'columnName' => 'PEROPERT2',
+                                            'required' => null,
+                                            'get' => 'true',
+                                            'set' => 'false',
+                                            'reference' => null),
+                        "property3"=>array( 'columnName' => 'PEROPERT3',
+                                            'required' => null,
+                                            'get' => 'true',
+                                            'set' => 'false',
+                                            'foreignField' => 'icircle\annotations\Annotation->property1')
+                    )
+                )
+            )
         );
     }
 

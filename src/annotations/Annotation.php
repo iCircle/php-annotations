@@ -9,6 +9,7 @@ class Annotation{
     const TYPE       = "type";
     const ALLOW_NULL = "allowNull";
     const VALIDATE   = "validate";
+    const DEFAULT_VALUE = "default";
 
     /**
      * Method to register Annotation Definitions
@@ -133,7 +134,7 @@ class Annotation{
 
         $annotations["class"] = $classAnnotations;
 
-        if(is_string($memberName) && $memberName == "*"){
+        if(!isset($memberName) || (is_string($memberName) && ($memberName == "*" || $memberName == ""))){
             $memberAnnotations = array();
             //get all annotations for members
             $reflectionProperties = $reflectionClass->getProperties();
@@ -153,7 +154,9 @@ class Annotation{
                     $memberAnnotations[$reflectionMethod->getName()] = $methodAnnotations;
                 }
             }
-            $annotations["members"] = $memberAnnotations;
+            if(count($memberAnnotations) > 0){
+                $annotations["members"] = $memberAnnotations;
+            }
         }
         return $annotations;
     }
@@ -273,6 +276,7 @@ class Annotation{
                 }else{
                     if($token[0] == T_CONSTANT_ENCAPSED_STRING){
                         $token[1] = stripcslashes($token[1]);
+                        $token[1] = substr($token[1],1,strlen($token[1])-2);
                     }
 
                     if($annotationValue == null){
@@ -307,18 +311,18 @@ class Annotation{
                 $annotationValue = $annotationDefinition[self::VALIDATE]($annotationValue);
             }else if($annotationValue == null){
                 // check for null
-                $_allowNull = $annotationDefinition[self::ALLOW_NULL];
-                if(isset($_allowNull) && ($_allowNull == false || trim(strtoupper($_allowNull)) == "FALSE")){
+                if(array_key_exists(self::DEFAULT_VALUE,$annotationDefinition)){
+                    $annotationValue = $annotationDefinition[self::DEFAULT_VALUE];
+                }else if(array_key_exists(self::ALLOW_NULL,$annotationDefinition) && ($annotationDefinition[self::ALLOW_NULL] == false || trim(strtoupper($annotationDefinition[self::ALLOW_NULL])) == "FALSE")){
                     continue;
                 }
-            }else if(is_string($annotationValue)){
-                $_type = $annotationDefinition[self::TYPE];
-                if(isset($_type) && (trim(strtoupper($_type)) != "ANY" && trim(strtoupper($_type)) != "STRING")){
+            }
+            if(is_string($annotationValue)){
+                if(array_key_exists(self::TYPE,$annotationDefinition) && (trim(strtoupper($annotationDefinition[self::TYPE])) != "ANY" && trim(strtoupper($annotationDefinition[self::TYPE])) != "STRING")){
                     continue;
                 }
             }else{
-                $_type = $annotationDefinition[self::TYPE];
-                if(isset($_type) && (trim(strtoupper($_type)) != "ANY" && trim(strtoupper($_type)) != "ARRAY")){
+                if(array_key_exists(self::TYPE,$annotationDefinition) && (trim(strtoupper($annotationDefinition[self::TYPE])) != "ANY" && trim(strtoupper($annotationDefinition[self::TYPE])) != "ARRAY")){
                     continue;
                 }
             }
@@ -326,7 +330,11 @@ class Annotation{
             $annotations[$annotationName] = $annotationValue;
         }
 
-        return $annotations;
+        if(count($annotations) > 0){
+            return $annotations;
+        }else{
+            return FALSE;
+        }
     }
 
 
