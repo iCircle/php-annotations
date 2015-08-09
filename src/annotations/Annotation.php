@@ -177,7 +177,7 @@ class Annotation{
 
     static private function getAnnotationsFromDocComment($docComment,$type){
 
-        $docCommentLines = preg_split("[\r\n]",$docComment);
+        $docCommentLines = preg_split("/[\r]*\n/",$docComment);
 
         $annotations = array();
         foreach($docCommentLines as $docCommentLine){
