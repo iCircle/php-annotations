@@ -37,9 +37,22 @@ class SampleClass{
     private $property3 = null;
 
     /**
+     * @version 0
+     * @constantValue
+     */
+    const constant1 = 'constant 1 value';
+
+    /**
      * @version 1
      */
     public function setProperty1(){
+
+    }
+
+    /**
+     * @version 2
+     */
+    public function setProperty2(){
 
     }
 
@@ -113,11 +126,11 @@ class AnnotationTest extends \PHPUnit_Framework_TestCase{
     /**
      * @dataProvider getAnnotationsDataProvider
      */
-    public function testGetAnnotations($registry,$className,$memberName=null,$output){
+    public function testGetAnnotations($registry,$className,$member,$output){
 
         Annotation::registerAnnotations($registry);
 
-        $annotations = Annotation::getAnnotations($className,$memberName);
+        $annotations = Annotation::getAnnotations($className,$member[0],$member[1],$member[2]);
 
         $this->assertArraySubset($annotations,$output);
         $this->assertArraySubset($output,$annotations);
@@ -130,13 +143,15 @@ class AnnotationTest extends \PHPUnit_Framework_TestCase{
                 "required"=>array("appliedOn"=>"property","type"=>"string")
                 ),
                 'icircle\annotations\SampleClass', // className
-                null, // memberName
+                array("*",null,null), // memberName
                 array("class"=>array("tableName"=>"SAMPLE"), // output
-                      "members"=>array(
+                      "properties"=>array(
                           "property1"=>array("required"=>null),
                           "property2"=>array("required"=>null),
                           "property3"=>array("required"=>null)
-                      )
+                      ),
+                      "constants"=>array(),
+                      "methods"=>array()
                 )
             ),
             array(
@@ -146,12 +161,14 @@ class AnnotationTest extends \PHPUnit_Framework_TestCase{
                     "get"=>array("appliedOn"=>"property"),
                     "set"=>array("appliedOn"=>"property"),
                     "reference"=>array("appliedOn"=>"property"),
-                    "foreignField"=>array("appliedOn"=>"property","allowNull"=>false)
+                    "foreignField"=>array("appliedOn"=>"property","allowNull"=>false),
+                    "version"=>array("appliedOn"=>"All"),
+                    "constantValue"=>array("appliedOn"=>"constant")
                 ),
                 'icircle\annotations\SampleClass', // className
-                null, // memberName
+                array("*","*","setProperty1"), // memberName
                 array("class"=>array("tableName"=>"SAMPLE"), // output
-                    "members"=>array(
+                    "properties"=>array(
                         "property1"=>array( 'columnName' => 'PEROPERT1',
                                             'required' => null,
                                             'get' => 'true',
@@ -167,6 +184,13 @@ class AnnotationTest extends \PHPUnit_Framework_TestCase{
                                             'get' => 'true',
                                             'set' => 'false',
                                             'foreignField' => 'icircle\annotations\Annotation->property1')
+                    ),
+                    "constants"=>array(
+                        "constant1"=>array( 'constantValue'=>null,
+                                            'version' => 0)
+                    ),
+                    "methods"=>array(
+                        "setProperty1"=>array('version'=>1)
                     )
                 )
             )
