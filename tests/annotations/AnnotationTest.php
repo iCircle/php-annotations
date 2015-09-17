@@ -61,13 +61,14 @@ class SampleClass{
 class AnnotationTest extends \PHPUnit_Framework_TestCase{
 
     public function setUp(){
-        Annotation::unRegisterAnnotations();
+        //Annotation::unRegisterAnnotations();
     }
 
     /**
      * @dataProvider registryProvider
      */
-    public function testRegisterAnnotations($source,$type,$isPositiveInput){
+    /**
+     public function testRegisterAnnotations($source,$type,$isPositiveInput){
 
         $isException = false;
         try{
@@ -120,81 +121,62 @@ class AnnotationTest extends \PHPUnit_Framework_TestCase{
             array('{"aaa":"bbbb","ccc"}abcd', null, false),
             array(array("aaa"=>"bbbb","ccc"=>"dddd"), null, true)
         );
-    }
+    }*/
 
 
-    /**
-     * @dataProvider getAnnotationsDataProvider
-     */
-    public function testGetAnnotations($registry,$className,$member,$output){
+    public function testGetAnnotations(){
 
-        Annotation::registerAnnotations($registry);
+        $annotations = Annotation::getAnnotations('icircle\annotations\SampleClass');
 
-        $annotations = Annotation::getAnnotations($className,$member[0],$member[1],$member[2]);
+        $expected = array(
+            "class" => array(
+                "package" => "icircle",
+                "required" => null,
+                "tableName" => "SAMPLE",
+            ),
 
-        $this->assertArraySubset($annotations,$output);
-        $this->assertArraySubset($output,$annotations);
-    }
-
-    public function getAnnotationsDataProvider(){
-        return array(
-            array(
-                array("tableName"=>array("appliedOn"=>"class","allowNull"=>false,"type"=>"string"),  // registry
-                "required"=>array("appliedOn"=>"property","type"=>"string")
+            "properties" => array(
+                "property1" => array(
+                    "columnName" => "PEROPERT1",
+                    "required" => null,
+                    "get" => true,
+                    "set" => false,
+                    "reference" => null,
                 ),
-                'icircle\annotations\SampleClass', // className
-                array("*",null,null), // memberName
-                array("class"=>array("tableName"=>"SAMPLE"), // output
-                      "properties"=>array(
-                          "property1"=>array("required"=>null),
-                          "property2"=>array("required"=>null),
-                          "property3"=>array("required"=>null)
-                      ),
-                      "constants"=>array(),
-                      "methods"=>array()
+                "property2" => array(
+                    "columnName" => "PEROPERT2",
+                    "required" => null,
+                    "get" => true,
+                    "set" => false,
+                    "reference" => null
+                ),
+                "property3" => array(
+                    "columnName" => "PEROPERT3",
+                    "required" => null,
+                    "get" => true,
+                    "set" => false,
+                    "foreignField" => 'icircle\annotations\Annotation->property1'
                 )
             ),
-            array(
-                array("tableName"=>array("appliedOn"=>"class","allowNull"=>false,"type"=>"string"),  // registry
-                    "required"=>array("appliedOn"=>"property","type"=>"string"),
-                    "columnName"=>array("appliedOn"=>"property","allowNull"=>false,"type"=>"string"),
-                    "get"=>array("appliedOn"=>"property"),
-                    "set"=>array("appliedOn"=>"property"),
-                    "reference"=>array("appliedOn"=>"property"),
-                    "foreignField"=>array("appliedOn"=>"property","allowNull"=>false),
-                    "version"=>array("appliedOn"=>"All"),
-                    "constantValue"=>array("appliedOn"=>"constant")
+            "constants" => array(
+                "constant1" => array(
+                    "version" => 0,
+                    "constantValue" => null
+                )
+            ),
+            "methods" => array(
+                "setProperty1" => array(
+                    "version" => 1
                 ),
-                'icircle\annotations\SampleClass', // className
-                array("*","*","setProperty1"), // memberName
-                array("class"=>array("tableName"=>"SAMPLE"), // output
-                    "properties"=>array(
-                        "property1"=>array( 'columnName' => 'PEROPERT1',
-                                            'required' => null,
-                                            'get' => 'true',
-                                            'set' => 'false',
-                                            'reference' => null),
-                        "property2"=>array( 'columnName' => 'PEROPERT2',
-                                            'required' => null,
-                                            'get' => 'true',
-                                            'set' => 'false',
-                                            'reference' => null),
-                        "property3"=>array( 'columnName' => 'PEROPERT3',
-                                            'required' => null,
-                                            'get' => 'true',
-                                            'set' => 'false',
-                                            'foreignField' => 'icircle\annotations\Annotation->property1')
-                    ),
-                    "constants"=>array(
-                        "constant1"=>array( 'constantValue'=>null,
-                                            'version' => 0)
-                    ),
-                    "methods"=>array(
-                        "setProperty1"=>array('version'=>1)
-                    )
+                "setProperty2" => array(
+                    "version" => 2
                 )
             )
         );
+
+        $this->assertArraySubset($annotations,$expected);
+
     }
+
 
 }
