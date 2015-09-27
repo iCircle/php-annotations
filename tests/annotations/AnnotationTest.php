@@ -7,6 +7,7 @@ namespace icircle\annotations;
  * @package icircle\annotations
  * @required
  * @tableName SAMPLE
+ * @createAccess (group1,group2)
  */
 class SampleClass{
     /**
@@ -133,6 +134,7 @@ class AnnotationTest extends \PHPUnit_Framework_TestCase{
                 "package" => "icircle",
                 "required" => null,
                 "tableName" => "SAMPLE",
+                "createAccess" => array("group1","group2")
             ),
 
             "properties" => array(
@@ -175,6 +177,7 @@ class AnnotationTest extends \PHPUnit_Framework_TestCase{
         );
 
         $this->assertArraySubset($annotations,$expected);
+        $this->assertArraySubset($expected,$annotations);
 
     }
 

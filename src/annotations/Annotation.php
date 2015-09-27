@@ -45,7 +45,7 @@ class Annotation{
         $methodNames   = array();
 
         // Validate inputs
-        if($propertyName != null) {
+        if($propertyName !== null) {
             if($propertyName == "*"){
                 $props = $reflectionClass->getProperties();
                 foreach ($props as $prop) {
@@ -60,7 +60,7 @@ class Annotation{
             }
         }
 
-        if($constantName != null) {
+        if($constantName !== null) {
             if($constantName == "*"){
                 $props = $reflectionClass->getConstants();
                 $constantNames = array_keys($props);
@@ -73,7 +73,7 @@ class Annotation{
             }
         }
 
-        if($methodName != null) {
+        if($methodName !== null) {
             if($methodName == "*"){
                 $props = $reflectionClass->getMethods();
                 foreach ($props as $prop) {
@@ -262,7 +262,7 @@ class Annotation{
                 $token = $tokens[$i];
 
                 if(is_string($token)){
-                    if($annotationValue == null){
+                    if($annotationValue === null){
                         if($token == "("){
                             $annotationValue = array();
                             continue;
@@ -291,7 +291,7 @@ class Annotation{
                         $token[1] = substr($token[1],1,strlen($token[1])-2);
                     }
 
-                    if($annotationValue == null){
+                    if($annotationValue === null){
                         if($token[0] == T_WHITESPACE){
                             $hasSpaceBetweenNameAndValue = true;
                             continue;
@@ -323,11 +323,11 @@ class Annotation{
                 $annotationValue = 0 + $annotationValue;
             }
 
-            if(strtoupper($annotationValue) == "TRUE"){
+            if(is_string($annotationValue) && strtoupper($annotationValue) == "TRUE"){
                 $annotationValue = true;
             }
 
-            if(strtoupper($annotationValue) == "FALSE"){
+            if(is_string($annotationValue) && strtoupper($annotationValue) == "FALSE"){
                 $annotationValue = false;
             }
 
